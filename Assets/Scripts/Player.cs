@@ -23,7 +23,7 @@ public class Player: MonoBehaviour
     }
     [SerializeField] private MoveSettings moveSettings;
 
-    [SerializeField] private Transform spawnPoint;
+   
 
 
     #region InputValues
@@ -42,8 +42,6 @@ public class Player: MonoBehaviour
         _targetRotation = transform.localRotation;
     }
 
-    private bool isSpawned = false;
-
     private void Update()
     {
         GetInput();
@@ -52,19 +50,10 @@ public class Player: MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isSpawned)
-        {
-            isSpawned = true;
-            Spawn();
-        }
         Run();
         Jump();
     }
 
-    private void Spawn()
-    {
-        transform.position = spawnPoint.position;
-    }
 
     private void GetInput()
     {
@@ -114,7 +103,7 @@ public class Player: MonoBehaviour
         DeathZone deathZone = other.GetComponent<DeathZone>();
         if(deathZone != null)
         {
-            Spawn();
+            GetComponent<Spawnable>().Spawn();
         }
     }
 }
