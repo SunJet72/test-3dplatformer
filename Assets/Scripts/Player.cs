@@ -106,6 +106,15 @@ public class Player: MonoBehaviour
     private bool IsGrounded()
     {
         return Physics.Raycast(transform.position, Vector3.down,
-            moveSettings.distanceToGround, moveSettings.ground);
+            moveSettings.distanceToGround, moveSettings.ground, QueryTriggerInteraction.Ignore);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        DeathZone deathZone = other.GetComponent<DeathZone>();
+        if(deathZone != null)
+        {
+            Spawn();
+        }
     }
 }
