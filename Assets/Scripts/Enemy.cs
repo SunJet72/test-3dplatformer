@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.AI;
 
-public enum Behaviour { Chase, Intercept, Patrol, ChasePatrol, Hide, LOS }
+public enum Behaviour { Chase, Intercept, Patrol, ChasePatrol, Hide, LOS, PatrolNavMesh }
 
 public class Enemy : MonoBehaviour
 {
@@ -15,9 +16,15 @@ public class Enemy : MonoBehaviour
     [SerializeField] private Transform[] wayPoints;
 
     private Rigidbody rb;
+    private NavMeshAgent agent;
 
     private int currentWayPoint = 0;
-
+    private void Awake()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        agent.autoBraking = false;
+        agent.destination = wayPoints[currentWayPoint].position;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -45,6 +52,10 @@ public class Enemy : MonoBehaviour
                 break;
             case Behaviour.LOS:
                 LineOfSight();
+                break;
+            case Behaviour.PatrolNavMesh:
+                if(!agent.pathPending && agent.remainingDistance < 0.5f)
+                    NavigateToNextPoint();
                 break;
             default: break;
         }
@@ -93,12 +104,19 @@ public class Enemy : MonoBehaviour
         Gizmos.DrawLine(startPointG, endPointG);
     }
 
-    private void OnTriggerEnter(Collider other)
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    WayPoint point = other.GetComponent<WayPoint>();
+    //    if(point != null)
+    //    {
+    //        currentWayPoint = (currentWayPoint < wayPoints.Length - 1) ? currentWayPoint + 1 : 0;
+    //    }
+    //}
+
+    private void NavigateToNextPoint()
     {
-        WayPoint point = other.GetComponent<WayPoint>();
-        if(point != null)
-        {
-            currentWayPoint = (currentWayPoint < wayPoints.Length - 1) ? currentWayPoint + 1 : 0;
-        }
+        Debug.Log("Next");
+        currentWayPoint = (currentWayPoint + 1) % wayPoints.Length;
+        agent.destination = wayPoints[currentWayPoint].position;
     }
 }
